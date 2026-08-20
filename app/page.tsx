@@ -10,12 +10,13 @@ export default function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dealerOpen, setDealerOpen] = useState(false);
   const [dealerSent, setDealerSent] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   useEffect(() => {
-    const close = (event: KeyboardEvent) => event.key === "Escape" && setDealerOpen(false);
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") { setDealerOpen(false); setReportOpen(false); } };
     window.addEventListener("keydown", close);
-    document.body.style.overflow = dealerOpen ? "hidden" : "";
+    document.body.style.overflow = dealerOpen || reportOpen ? "hidden" : "";
     return () => { window.removeEventListener("keydown", close); document.body.style.overflow = ""; };
-  }, [dealerOpen]);
+  }, [dealerOpen, reportOpen]);
   const moveWater = (event: MouseEvent<HTMLElement>) => {
     const box = event.currentTarget.getBoundingClientRect();
     event.currentTarget.style.setProperty("--mx", `${event.clientX - box.left}px`);
@@ -55,6 +56,17 @@ export default function Home() {
               <button className="dealer-submit" type="submit"><span>Başvuruyu gönder</span><b>↗</b></button>
             </form>}
           </section>
+        </div>
+      </div>}
+      {reportOpen && <div className="report-modal" role="dialog" aria-modal="true" aria-labelledby="report-title" onMouseDown={(e) => e.target === e.currentTarget && setReportOpen(false)}>
+        <div className="report-dialog">
+          <div className="report-head"><div><span>ABANT SU · KALİTE LABORATUVARI</span><h2 id="report-title">Örnek Analiz Raporu</h2></div><button onClick={() => setReportOpen(false)} aria-label="Raporu kapat">×</button></div>
+          <div className="sample-alert"><b>ÖRNEKTİR</b><p>Bu belge yalnızca arayüz gösterimi için hazırlanmıştır. Resmî analiz raporu veya laboratuvar sonucu değildir.</p></div>
+          <div className="report-meta"><div><small>NUMUNE</small><strong>Doğal Kaynak Suyu</strong></div><div><small>RAPOR NO</small><strong>ÖRNEK-2026-001</strong></div><div><small>RAPOR TARİHİ</small><strong>20.08.2026</strong></div><div><small>DURUM</small><strong className="status-ok">Temsili ✓</strong></div></div>
+          <div className="report-table-wrap"><table className="report-table"><thead><tr><th>Parametre</th><th>Temsili sonuç</th><th>Birim</th><th>Referans aralığı</th></tr></thead><tbody>
+            <ReportRow name="pH" result="7,42" unit="pH" range="6,5 – 9,5"/><ReportRow name="İletkenlik" result="184" unit="µS/cm" range="≤ 2500"/><ReportRow name="Kalsiyum" result="32,6" unit="mg/L" range="Bilgilendirme"/><ReportRow name="Magnezyum" result="7,8" unit="mg/L" range="Bilgilendirme"/><ReportRow name="Sodyum" result="4,1" unit="mg/L" range="≤ 200"/><ReportRow name="Nitrat" result="2,3" unit="mg/L" range="≤ 50"/><ReportRow name="Florür" result="0,08" unit="mg/L" range="≤ 1,5"/><ReportRow name="Bulanıklık" result="0,12" unit="NTU" range="≤ 1"/>
+          </tbody></table></div>
+          <div className="report-foot"><span>Değerlerin tamamı temsili örnek veridir.</span><a href="https://abantsu.com.tr/Uploads/020725-tse-detayl-analiz.73iqx.pdf" target="_blank" rel="noreferrer">Resmî raporları görüntüle ↗</a></div>
         </div>
       </div>}
 
@@ -98,7 +110,7 @@ export default function Home() {
 
       <section className="quality" id="kalite">
         <div><p className="kicker">ŞEFFAFLIK & GÜVEN</p><h2>Her damlada<br/><i>aynı özen.</i></h2></div>
-        <div className="quality-copy"><p>Modern, hijyenik ve çevreye duyarlı sistemlerle üretiyor; suyun doğal yapısını düzenli analizlerle güvence altına alıyoruz.</p><a className="button outline" href="https://abantsu.com.tr/analiz-raporlari-kalite-politikalari/" target="_blank" rel="noreferrer">Analiz raporları <Arrow /></a></div>
+        <div className="quality-copy"><p>Modern, hijyenik ve çevreye duyarlı sistemlerle üretiyor; suyun doğal yapısını düzenli analizlerle güvence altına alıyoruz.</p><button className="button outline" onClick={() => setReportOpen(true)}>Analiz raporları <Arrow /></button></div>
         <div className="quality-items"><span>01 <b>Kaynak koruma</b></span><span>02 <b>Hijyenik dolum</b></span><span>03 <b>Düzenli analiz</b></span><span>04 <b>Çevreci yaklaşım</b></span></div>
       </section>
 
@@ -110,3 +122,4 @@ export default function Home() {
 }
 
 function FooterCol({title, links}:{title:string; links:string[]}) { return <div className="footer-col"><h4>{title}</h4>{links.map(link => <a key={link} href="#">{link}</a>)}</div> }
+function ReportRow({name,result,unit,range}:{name:string;result:string;unit:string;range:string}) { return <tr><td>{name}</td><td><strong>{result}</strong></td><td>{unit}</td><td>{range}</td></tr> }
